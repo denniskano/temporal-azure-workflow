@@ -1,0 +1,7 @@
+com/example/App.class
+com/example/AzureFunctionWorkflowImpl.class
+com/example/WorkflowStarter.class
+com/example/AzureFunctionWorkflow.class
+com/example/AzureFunctionActivities.class
+com/example/TemporalWorker.class
+com/example/AzureFunctionActivitiesImpl.class
