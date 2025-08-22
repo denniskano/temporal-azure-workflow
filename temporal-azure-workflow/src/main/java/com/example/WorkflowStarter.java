@@ -7,7 +7,7 @@ import java.time.Duration;
 
 public class WorkflowStarter {
     
-    private static final String TASK_QUEUE = "AZURE_FUNCTION_TASK_QUEUE";
+    private static final String TASK_QUEUE = "AZURE_SERVICES_TASK_QUEUE";
     
     public static void main(String[] args) {
         // Create a gRPC connection to the Temporal server
@@ -19,16 +19,16 @@ public class WorkflowStarter {
         // Create workflow options
         WorkflowOptions options = WorkflowOptions.newBuilder()
                 .setTaskQueue(TASK_QUEUE)
-                .setWorkflowId("azure-function-workflow-" + System.currentTimeMillis())
+                .setWorkflowId("azure-services-workflow-" + System.currentTimeMillis())
                 .setWorkflowExecutionTimeout(Duration.ofMinutes(10))
                 .build();
         
         // Create a workflow stub
-        AzureFunctionWorkflow workflow = client.newWorkflowStub(AzureFunctionWorkflow.class, options);
+        AzureServicesWorkflow workflow = client.newWorkflowStub(AzureServicesWorkflow.class, options);
         
         // Start the workflow
-        System.out.println("Starting Azure Function workflow...");
-        String result = workflow.processWithAzureFunction("Hello from Temporal!");
+        System.out.println("Starting Azure Services orchestration workflow...");
+        String result = workflow.orchestrateAzureServices("Hello from Temporal!");
         
         System.out.println("Workflow completed successfully!");
         System.out.println("Result: " + result);

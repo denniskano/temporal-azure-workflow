@@ -4,8 +4,8 @@ import io.temporal.workflow.WorkflowInterface;
 import io.temporal.workflow.WorkflowMethod;
 
 @WorkflowInterface
-public interface AzureFunctionWorkflow {
+public interface AzureServicesWorkflow {
     
     @WorkflowMethod
-    String processWithAzureFunction(String inputData);
+    String orchestrateAzureServices(String inputData);
 }

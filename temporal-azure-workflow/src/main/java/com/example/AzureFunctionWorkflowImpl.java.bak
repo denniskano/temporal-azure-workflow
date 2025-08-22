@@ -1,0 +1,61 @@
+package com.example;
+
+import io.temporal.activity.ActivityOptions;
+import io.temporal.common.RetryOptions;
+import io.temporal.workflow.Workflow;
+import java.time.Duration;
+
+public class AzureFunctionWorkflowImpl implements AzureFunctionWorkflow {
+    
+    private final ActivityOptions activityOptions = ActivityOptions.newBuilder()
+            .setStartToCloseTimeout(Duration.ofMinutes(5))
+            .setRetryOptions(RetryOptions.newBuilder()
+                    .setInitialInterval(Duration.ofSeconds(1))
+                    .setMaximumInterval(Duration.ofSeconds(10))
+                    .setBackoffCoefficient(2.0)
+                    .setMaximumAttempts(3)
+                    .build())
+            .build();
+    
+    private final AzureFunctionActivities azureActivities = 
+            Workflow.newActivityStub(AzureFunctionActivities.class, activityOptions);
+    
+    private final DatabricksActivities databricksActivities = 
+            Workflow.newActivityStub(DatabricksActivities.class, activityOptions);
+    
+    @Override
+    public String processWithAzureFunction(String inputData) {
+        // Log the start of the workflow
+        Workflow.getLogger(AzureFunctionWorkflowImpl.class).info("Starting Azure Function workflow with input: {}", inputData);
+        
+        // Step 1: Call Azure Function to process the data
+        String processedData = azureActivities.callAzureFunction(inputData);
+        
+        // Step 2: Submit Databricks notebook job
+        String databricksRunId = databricksActivities.submitNotebookJob(
+            "/Repos/your-repo/HelloWorld", // Ruta a tu notebook
+            "0822-022205-xj9o1s00", 
+            "{\"input_data\":\"" + processedData + "\", \"source\":\"temporal-workflow\"}"
+        );
+        
+        // Step 3: Wait for Databricks job to complete
+        String jobStatus = "RUNNING";
+        while ("RUNNING".equals(jobStatus) || "PENDING".equals(jobStatus)) {
+            Workflow.sleep(Duration.ofSeconds(10)); // Wait 10 seconds before checking again
+            jobStatus = databricksActivities.getJobStatus(databricksRunId);
+        }
+        
+        // Step 4: Get Databricks job result
+        String databricksResult = databricksActivities.getJobResult(databricksRunId);
+        
+        // Step 5: Call Azure Function to validate the processed data
+        String validationResult = azureActivities.validateData(databricksResult);
+        
+        // Step 6: Call Azure Function to store the final result
+        String finalResult = azureActivities.storeResult(databricksResult, validationResult);
+        
+        Workflow.getLogger(AzureFunctionWorkflowImpl.class).info("Workflow completed successfully. Final result: {}", finalResult);
+        
+        return finalResult;
+    }
+}

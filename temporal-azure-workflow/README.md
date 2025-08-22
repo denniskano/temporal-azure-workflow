@@ -1,6 +1,6 @@
-# Temporal Workflow con Azure Functions
+# Temporal Azure Services Orchestration
 
-Este proyecto demuestra cómo crear un workflow de Temporal que consume Azure Functions.
+Este proyecto demuestra cómo crear un workflow de Temporal que orquesta múltiples servicios de Azure.
 
 ## Prerrequisitos
 
@@ -12,23 +12,39 @@ Este proyecto demuestra cómo crear un workflow de Temporal que consume Azure Fu
 
 ```
 src/main/java/com/example/
-├── AzureFunctionWorkflow.java          # Interfaz del workflow
-├── AzureFunctionWorkflowImpl.java      # Implementación del workflow
-├── AzureFunctionActivities.java        # Interfaz de actividades
-├── AzureFunctionActivitiesImpl.java    # Implementación de actividades
+├── AzureServicesWorkflow.java          # Interfaz del workflow
+├── AzureServicesWorkflowImpl.java      # Implementación del workflow
+├── AzureServicesActivities.java        # Interfaz de actividades de Azure Services
+├── AzureServicesActivitiesImpl.java    # Implementación de actividades de Azure Services
+├── DatabricksActivities.java           # Interfaz de actividades de Databricks
+├── DatabricksActivitiesImpl.java       # Implementación de actividades de Databricks
 ├── TemporalWorker.java                 # Worker de Temporal
 └── WorkflowStarter.java                # Cliente que inicia el workflow
+
+src/main/resources/
+└── HelloWorld.py                       # Notebook de Databricks
 ```
 
 ## Configuración
 
 ### Variables de Entorno
 
-Configura estas variables de entorno con tus valores de Azure Functions:
-
+#### Azure Functions
 ```bash
 export AZURE_FUNCTION_BASE_URL="https://tu-function-app.azurewebsites.net/api"
 export AZURE_FUNCTION_KEY="tu-clave-aqui"
+```
+
+#### Databricks
+```bash
+export DATABRICKS_WORKSPACE_URL="https://tu-workspace.azuredatabricks.net"
+export DATABRICKS_ACCESS_TOKEN="tu-databricks-token"
+```
+
+#### Configuración Automática
+Para configurar Databricks fácilmente:
+```bash
+./configure-databricks.sh
 ```
 
 ### Compilar el Proyecto
@@ -74,8 +90,9 @@ mvn exec:java -Dexec.mainClass="com.example.WorkflowStarter"
 ## Flujo del Workflow
 
 1. **Procesamiento**: Llama a Azure Function para procesar datos
-2. **Validación**: Valida los datos procesados
-3. **Almacenamiento**: Almacena el resultado final
+2. **Databricks**: Ejecuta notebook de Databricks para análisis de datos
+3. **Validación**: Valida los resultados de Databricks
+4. **Almacenamiento**: Almacena el resultado final
 
 ## Monitoreo
 

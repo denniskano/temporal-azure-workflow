@@ -3,7 +3,7 @@ package com.example;
 import io.temporal.activity.ActivityInterface;
 
 @ActivityInterface
-public interface AzureFunctionActivities {
+public interface AzureServicesActivities {
     
     String callAzureFunction(String inputData);
     

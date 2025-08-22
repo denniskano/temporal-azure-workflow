@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-public class AzureFunctionActivitiesImpl implements AzureFunctionActivities {
+public class AzureServicesActivitiesImpl implements AzureServicesActivities {
     
-    private static final Logger logger = LoggerFactory.getLogger(AzureFunctionActivitiesImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AzureServicesActivitiesImpl.class);
     
     private final OkHttpClient httpClient = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)

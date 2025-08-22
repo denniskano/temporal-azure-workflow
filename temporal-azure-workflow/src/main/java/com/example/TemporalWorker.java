@@ -7,7 +7,7 @@ import io.temporal.worker.WorkerFactory;
 
 public class TemporalWorker {
     
-    private static final String TASK_QUEUE = "AZURE_FUNCTION_TASK_QUEUE";
+    private static final String TASK_QUEUE = "AZURE_SERVICES_TASK_QUEUE";
     
     public static void main(String[] args) {
         // Create a gRPC connection to the Temporal server
@@ -23,10 +23,10 @@ public class TemporalWorker {
         Worker worker = factory.newWorker(TASK_QUEUE);
         
         // Register the workflow implementation
-        worker.registerWorkflowImplementationTypes(AzureFunctionWorkflowImpl.class);
+        worker.registerWorkflowImplementationTypes(AzureServicesWorkflowImpl.class);
         
-        // Register the activity implementation
-        worker.registerActivitiesImplementations(new AzureFunctionActivitiesImpl());
+        // Register the activity implementations
+        worker.registerActivitiesImplementations(new AzureServicesActivitiesImpl(), new DatabricksActivitiesImpl());
         
         // Start the worker
         factory.start();
